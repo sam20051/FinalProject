@@ -20,9 +20,42 @@ execute:
 
 
 ## Section 1
+```{python}
+import pandas as pd
+df = pd.read_csv("stats.csv")
 
+# Clearer column name for pitcher_id
+df['pitcher_id'] = df['player_id']
 
+# Sorting Data
+df = df.sort_values(['pitcher_id', 'year'])
 
+# Target variable
+df['target_era_next_year'] = (
+  df.groupby('pitcher_id')['p_era'].shift(-1)
+)
+
+# Drop rows with missing target variable
+df_model = df.dropna(subset=['target_era_next_year']).copy()
+
+# Change IP to a numeric format
+def convert_ip(ip):
+  ip = float(ip)
+  whole = int(ip)
+  frac = round(ip - whole, 1)
+
+  if frac == 0.1:
+    return whole + 1/3
+  elif frac == 0.2:
+    return whole + 2/3
+  else:
+    return whole
+
+df_model['ip_true'] = df_model['p_formatted_ip'].apply(convert_ip)
+
+# Change home run stat to a rate
+df_model['hr_per_9'] = df_model['home_run'] / df_model['ip_true'] * 9
+```
 
 
 
