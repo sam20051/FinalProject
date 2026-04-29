@@ -19,7 +19,11 @@ execute:
 ---
 
 
-## Section 1
+## Introduction
+
+## Background
+
+## Data
 ```{python}
 import pandas as pd
 df = pd.read_csv("stats.csv")
@@ -57,9 +61,11 @@ df_model['ip_true'] = df_model['p_formatted_ip'].apply(convert_ip)
 df_model['hr_per_9'] = df_model['home_run'] / df_model['ip_true'] * 9
 ```
 
+## Methods
 
+## Results
 
-## Section 2
+## Conclusion
 
 
 
