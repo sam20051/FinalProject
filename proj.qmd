@@ -21,7 +21,17 @@ execute:
 
 ## Introduction
 
+* Recently, there has been a growing debate about the usage of advanced statistics in baseball. Many new analysts have been arguing that traditional statistics, such as ERA, are not good indicators of a pitchers performance. 
+* This winter, teams needed to make decisions about which pitchers to sign for the upcoming season. Interestingly, many teams signed pitchers with high ERAs, due to their strong underlying metrics. Similarly, many teams declined to sign pitchers with low ERAs, due to their poor underlying metrics.
+* This project will attempt to determine which statistics are the best predictors of a pitcher's future ERA. We will look at traditional statistics, statcast data, and a mix of the two. 
+* Finally, we will attempt to predict the top pitchers in the league for the upcoming season, based on our model.
+
 ## Background
+
+* Traditional Statistics
+
+* Statcast Data
+
 
 ## Data
 ```{python}
