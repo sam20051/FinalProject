@@ -28,12 +28,23 @@ execute:
 
 ## Background
 
-* Traditional Statistics
+# Traditional Statistics 
+* Traditional statistics, such as ERA, WHIP, and strikeout rate have been used for decades to evaluate pitchers. 
+* These statistics are easy to understand and calculate, but have been criticized for not accounting for factors such as defense, luck, and park effects. 
+* For example, a pitcher with an elite defense behind him may have a lower ERA than a pitcher with a poor defense, even if they have the same underlying performance.
 
-* Statcast Data
+# Statcast Data
+* Statcast data, such as exit velocity, spin rate, and launch angle, began being collected in 2015 and has provided a new way to evaluate pitchers.
+* These statistics are more difficult to understand and calculate, but have been praised for providing a more accurate picture of a pitcher's performance.
+* For example, a pitcher with a high spin rate may be able to generate more swings and misses, even if they have a high ERA.
 
+# Example
+* This offseason, former Boston Red Sox pitcher, Lucas Giolito, was left unsigned for the entire offseason, despite having a solid 3.41 ERA in the 2025 season. The MLB average ERA in 2025 was 4.15, so Giolito's ERA was well above average. However, his underlying metrics were poor, leading many analysts to believe that he had a lucky season and his performance would regress.
+* On the other hand, when Giolito signed with the Red Sox in 2024, he had an ERA of 4.88 in the 2023 season, which was below average. However, his underlying metrics were strong, leading many analysts to believe that he had an unlucky season and his performance would improve. 
 
 ## Data
+
+* Dataset setup
 ```{python}
 import pandas as pd
 df = pd.read_csv("stats.csv")
@@ -72,6 +83,28 @@ df_model['hr_per_9'] = df_model['home_run'] / df_model['ip_true'] * 9
 ```
 
 ## Methods
+
+* The goal of this study is to evaluate the ability of traditional statistics and statcast metrics to predict future pitcher performance. 
+* The response variable is the pitcher's ERA in the following season, which is a commonly used measure of a pitcher's performance.
+* To construct this outcome, the dataset was sorted by pitcher and year, and the ERA for the next season was assigned to each row. This allows us to use the current season's statistics to predict the next season's ERA.
+
+Predictor Variables are divided into two categories: traditional statistics and statcast metrics.
+* Traditional statistics include:
+  * ERA (Earned Run Average)
+  * Strikeout Rate
+  * Walk Rate
+  * Home Run Rate
+* Statcast metrics include:
+  * Expected Weighted On-Base Average (xwOBA)
+  * Hard Hit Rate
+  * Whiff Rate
+
+To ensure valid predictions, the dataset was split chronologically into training, validation, and test sets. 
+
+Three modeling approaches were used to evaluate the predictive power of the different sets of variables:
+1. Linear Regression: A simple linear regression model was fitted to the data to establish a baseline for predictive performance.
+2. Random Forest: A random forest model was trained to capture potential non-linear relationships between the predictors and the response variable.
+3. Decision Tree: A decision tree model was also trained to provide an interpretable model of the relationships between the predictors and the response variable.
 
 ## Results
 
