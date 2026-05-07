@@ -82,6 +82,11 @@ df_model['ip_true'] = df_model['p_formatted_ip'].apply(convert_ip)
 df_model['hr_per_9'] = df_model['home_run'] / df_model['ip_true'] * 9
 ```
 
+Display of the dataset:
+```{python}
+df_model.head()
+```
+
 ## Methods
 
 * The goal of this study is to evaluate the ability of traditional statistics and statcast metrics to predict future pitcher performance. 
@@ -106,7 +111,98 @@ Three modeling approaches were used to evaluate the predictive power of the diff
 2. Random Forest: A random forest model was trained to capture potential non-linear relationships between the predictors and the response variable.
 3. Decision Tree: A decision tree model was also trained to provide an interpretable model of the relationships between the predictors and the response variable.
 
+
+```{python}
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error
+
+# Train / Validation / Test Split
+train = df_model[df_model['year'] <= 2022]
+validation = df_model[df_model['year'] == 2023]
+test = df_model[df_model['year'] == 2024]
+
+target = 'target_era_next_year'
+
+# Features
+features_traditional = [
+  'p_era',
+  'k_percent',
+  'bb_percent',
+  'hr_per_9'
+]
+
+features_statcast = [
+  'xba',
+  'hard_hit_percent',
+  'whiff_percent',
+]
+
+features_combined = [
+  'p_era',
+  'k_percent',
+  'bb_percent',
+  'hr_per_9',
+  'xba',
+  'hard_hit_percent',
+  'whiff_percent'
+]
+
+# Modeling
+def evaluate(model, features, train, val):
+  model.fit(train[features], train[target])
+  preds = model.predict(val[features])
+  rmse = np.sqrt(mean_squared_error(val[target], preds))
+  return rmse
+
+models = {
+  'Linear Regression': LinearRegression(),
+  'Decision Tree': DecisionTreeRegressor(max_depth=5, random_state=42),
+  'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42)
+}
+
+featuresets = {
+  'Traditional': features_traditional,
+  'Statcast': features_statcast,
+  'Combined': features_combined
+}
+
+results = []
+
+for model_name, model in models.items():
+  for feature_name, features in featuresets.items():
+    rmse = evaluate(model, features, train, validation)
+    results.append([model_name, feature_name, rmse])
+
+results_df = pd.DataFrame(results, columns=['Model', 'Features', 'RMSE'])
+results_df
+```
+
+# Model Comparison
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+
+model_avg = results_df.groupby('Model')['RMSE'].mean().sort_values()
+
+plt.figure(figsize=(6,4))
+plt.bar(model_avg.index, model_avg.values, color=['blue', 'orange', 'green'])
+plt.title('Average RMSE by Model')
+plt.ylabel('Average RMSE')
+plt.xlabel('Model')
+plt.xticks(rotation=20)
+
+plt.show()
+```
+
+From the bar plot, we can see that the Random Forest model has the lowest average RMSE across all feature sets, indicating that it is the best performing model for predicting future ERA.
+
+
 ## Results
+
+
 
 ## Conclusion
 
