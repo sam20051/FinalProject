@@ -140,7 +140,6 @@ features_traditional = [
 ]
 
 features_statcast = [
-  'xwoba',
   'xba',
   'hard_hit_percent',
   'whiff_percent',
@@ -151,7 +150,6 @@ features_combined = [
   'k_percent',
   'bb_percent',
   'hr_per_9',
-  'xwoba',
   'xba',
   'hard_hit_percent',
   'whiff_percent'
