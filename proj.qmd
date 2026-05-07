@@ -199,6 +199,34 @@ plt.show()
 
 From the bar plot, we can see that the Random Forest model has the lowest average RMSE across all feature sets, indicating that it is the best performing model for predicting future ERA.
 
+# Optimizing Combined Model
+```{python}
+import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
+
+train_full = df_model[df_model['year'] <= 2024]
+
+model = RandomForestRegressor(n_estimators=200, max_depth=5, random_state=42)
+
+model.fit(train_full[features_combined], train_full[target])
+
+importances = pd.Series(model.feature_importances_, index=features_combined)
+importances.sort_values().plot(kind='barh')
+```
+
+* This chart shows the importance of each feature in the combined model. We can see that Strikeout Rate and home run rate are the most important predictors of future ERA, while Walk Rate and Hard Hit Rate are less important.
+* All of the variables have some predictive power, which suggests that a combination of traditional statistics and statcast metrics is the best approach, and no single variable should be removed from the model.
+
+# Prediction of Top Pitchers for 2026
+```{python}
+latest_season = df_model[df_model['year'] == 2025].copy()
+
+latest_season['predicted_era_2026'] = model.predict(latest_season[features_combined])
+latest_season_sorted = latest_season.sort_values('predicted_era_2026')
+latest_season_sorted[['last_name, first_name', 'predicted_era_2026']].head(10)
+```
+
+
 
 ## Results
 
