@@ -43,7 +43,6 @@ execute:
 * On the other hand, when Giolito signed with the Red Sox in 2024, he had an ERA of 4.88 in the 2023 season, which was below average. However, his underlying metrics were strong, leading many analysts to believe that he had an unlucky season and his performance would improve. 
 
 ## Data
-
 * Dataset setup
 ```{python}
 import pandas as pd
@@ -105,7 +104,7 @@ Predictor Variables are divided into two categories: traditional statistics and 
   * Walk Rate
   * Home Run Rate
 * Statcast metrics include:
-  * Expected Weighted On-Base Average (xwOBA)
+  * Expected Batting Average (xBA)
   * Hard Hit Rate
   * Whiff Rate
 
@@ -119,9 +118,11 @@ Three modeling approaches were used to evaluate the predictive power of the diff
 
 ```{python}
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
 from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error
 
 # Train / Validation / Test Split
@@ -133,7 +134,6 @@ target = 'target_era_next_year'
 
 # Features
 features_traditional = [
-  'p_era',
   'k_percent',
   'bb_percent',
   'hr_per_9'
@@ -146,7 +146,6 @@ features_statcast = [
 ]
 
 features_combined = [
-  'p_era',
   'k_percent',
   'bb_percent',
   'hr_per_9',
@@ -155,17 +154,27 @@ features_combined = [
   'whiff_percent'
 ]
 
-# Modeling
+# Modeling function
 def evaluate(model, features, train, val):
   model.fit(train[features], train[target])
   preds = model.predict(val[features])
   rmse = np.sqrt(mean_squared_error(val[target], preds))
   return rmse
 
+# Models
 models = {
   'Linear Regression': LinearRegression(),
-  'Decision Tree': DecisionTreeRegressor(max_depth=5, random_state=42),
-  'Random Forest': RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42)
+  'Gradient Boosting': GradientBoostingRegressor(
+      n_estimators=200,
+      learning_rate=0.05,
+      max_depth=3,
+      random_state=42
+  ),
+  'Random Forest': RandomForestRegressor(
+      n_estimators=100,
+      max_depth=5,
+      random_state=42
+  )
 }
 
 featuresets = {
@@ -185,40 +194,6 @@ results_df = pd.DataFrame(results, columns=['Model', 'Features', 'RMSE'])
 results_df
 ```
 
-# Model Comparison
-```{python}
-import pandas as pd
-import matplotlib.pyplot as plt
-
-model_avg = results_df.groupby('Model')['RMSE'].mean().sort_values()
-
-plt.figure(figsize=(6,4))
-plt.bar(model_avg.index, model_avg.values, color=['blue', 'orange', 'green'])
-plt.title('Average RMSE by Model')
-plt.ylabel('Average RMSE')
-plt.xlabel('Model')
-plt.xticks(rotation=20)
-
-plt.show()
-```
-
-From the bar plot, we can see that the Random Forest model has the lowest average RMSE across all feature sets, indicating that it is the best performing model for predicting future ERA.
-
-# Optimizing Combined Model
-```{python}
-import pandas as pd
-from sklearn.ensemble import RandomForestRegressor
-
-train_full = df_model[df_model['year'] <= 2024]
-
-model = RandomForestRegressor(n_estimators=200, max_depth=5, random_state=42)
-
-model.fit(train_full[features_combined], train_full[target])
-
-importances = pd.Series(model.feature_importances_, index=features_combined)
-importances.sort_values().plot(kind='barh')
-```
-
 * This chart shows the importance of each feature in the combined model. We can see that Strikeout Rate and home run rate are the most important predictors of future ERA, while Walk Rate and Hard Hit Rate are less important.
 * All of the variables have some predictive power, which suggests that a combination of traditional statistics and statcast metrics is the best approach, and no single variable should be removed from the model.
 
@@ -226,27 +201,52 @@ importances.sort_values().plot(kind='barh')
 ```{python}
 latest_season = df[df['year'] == 2025].copy()
 
-# Clean names for matching
+# Clean names
 latest_season['name_clean'] = latest_season['last_name, first_name'].apply(clean_name)
 
-# Check for missing values in features
-latest_season = latest_season.dropna(subset=features_combined)
+# Drop missing values for required features
+latest_season = latest_season.dropna(subset=features_traditional)
 
-# Predict
-latest_season['predicted_era_2026'] = model.predict(
-    latest_season[features_combined]
-)
+# Ensure correct feature matrix
+X_latest = latest_season[features_traditional]
 
-# Sort results
-latest_season = latest_season.sort_values('predicted_era_2026')
+# Predict using RANDOM FOREST (traditional model)
+latest_season['predicted_era_2026'] = final_model.predict(X_latest)
 
-latest_season[['name_clean', 'predicted_era_2026']].head(10)
+# Sort (lowest ERA = best pitchers)
+top10 = latest_season.sort_values('predicted_era_2026').head(10)
+
+# Display clean output
+top10[['name_clean', 'predicted_era_2026']]
 ```
 
 # Free Agents
 
 ```{python}
-# Free Agent Data
+import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
+
+# Features
+features_final = [
+    'k_percent',
+    'bb_percent',
+    'hr_per_9'
+]
+
+target = 'target_era_next_year'
+
+# Train 
+train_full = df_model.dropna(subset=features_final + [target])
+
+model = RandomForestRegressor(
+    n_estimators=200,
+    max_depth=5,
+    random_state=42
+)
+
+model.fit(train_full[features_final], train_full[target])
+
+# Free agent data
 free_agents = pd.DataFrame({
     'name': [
         'Valdez, Framber','Cease, Dylan','Suarez, Ranger','King, Michael',
@@ -282,39 +282,37 @@ free_agents['Average Annual Value'] = (
 # Clean names
 free_agents['name_clean'] = free_agents['name'].apply(clean_name)
 
-# Get 2025 data for free agents
+# 2025 season data for free agents
 df_2025 = df[df['year'] == 2025].copy()
 df_2025['name_clean'] = df_2025['last_name, first_name'].apply(clean_name)
 
-# Merge
+# Filter to only free agents
 fa_data = df_2025.merge(
     free_agents[['name_clean']],
     on='name_clean',
     how='inner'
 )
 
-# Drop missing features
-fa_data = fa_data.dropna(subset=features_combined)
+# Ensure no missing values in model inputs
+fa_data = fa_data.dropna(subset=features_final)
 
-# Predict
+# Predict 2026 ERA for free agents
 fa_data['predicted_era_2026'] = model.predict(
-    fa_data[features_combined]
+    fa_data[features_final]
 )
 
-# Merge with salary data
+# Merge predictions with salary data 
 fa_results = fa_data.merge(
     free_agents,
     on='name_clean',
     how='left'
 )
 
-# Sort
+#Sort
 fa_results = fa_results.sort_values('predicted_era_2026')
 
-fa_results[['name', 'Average Annual Value', 'predicted_era_2026']]
+fa_results[['name', 'Average Annual Value', 'predicted_era_2026']].head(10)
 ```
-
-
 
 ## Results
 
@@ -322,44 +320,77 @@ fa_results[['name', 'Average Annual Value', 'predicted_era_2026']]
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Make sure no missing predictions
+# Clean Dataset
 fa_plot = fa_results.dropna(subset=['predicted_era_2026']).copy()
 
-# Rank by model (lower ERA = better pitcher)
-fa_plot['model_rank'] = fa_plot['predicted_era_2026'].rank(method='min')
+# Rankings
+fa_plot['model_rank'] = fa_plot['predicted_era_2026'].rank(method='min')  # lower = better pitcher
+fa_plot['salary_rank'] = fa_plot['Average Annual Value'].rank(ascending=False, method='min')  # higher salary = better rank
 
-# Rank by salary (higher salary = better perceived value)
-fa_plot['salary_rank'] = fa_plot['Average Annual Value'].rank(ascending=False, method='min')
+# Value gap
+fa_plot['value_gap'] = fa_plot['salary_rank'] - fa_plot['model_rank']
 
+# Top underpaid / overpaid
+top_underpaid = fa_plot.nlargest(5, 'value_gap')
+top_overpaid = fa_plot.nsmallest(5, 'value_gap')
+
+# Plot
 plt.figure(figsize=(10,6))
 
+# All players
 plt.scatter(
     fa_plot['salary_rank'],
-    fa_plot['model_rank']
+    fa_plot['model_rank'],
+    alpha=0.4
 )
 
-for i, row in fa_plot.iterrows():
+# Highlight underpaid
+plt.scatter(
+    top_underpaid['salary_rank'],
+    top_underpaid['model_rank'],
+    color='green',
+    s=120,
+    label='Top Underpaid (Best Value)'
+)
+
+# Highlight overpaid
+plt.scatter(
+    top_overpaid['salary_rank'],
+    top_overpaid['model_rank'],
+    color='red',
+    s=120,
+    label='Top Overpaid (Worst Value)'
+)
+
+# Labels for key points only
+for _, row in pd.concat([top_underpaid, top_overpaid]).iterrows():
     plt.text(
         row['salary_rank'],
         row['model_rank'],
         row['name'],
-        fontsize=8
+        fontsize=9
     )
 
-plt.title("Free Agent Evaluation: Salary Rank vs Model Rank")
+# Plot
+plt.title("Free Agent Market Inefficiency: Salary vs Model Performance")
 plt.xlabel("Salary Rank (Higher Paid → Lower Rank Number)")
-plt.ylabel("Model Rank (Better Predicted ERA → Lower Rank Number)")
+plt.ylabel("Model Rank (Better ERA → Lower Rank Number)")
 plt.grid(True, alpha=0.3)
+plt.legend()
 
 plt.show()
 ```
 
+This chart shows the relationship between salary rank and model rank for the free agents. The green points represent the top underpaid players, who are the best values in the market according to the model. The red points represent the top overpaid players, who are the worst values in the market according to the model.
 
 ## Conclusion
 
-
-
-
-
+From the modeling results, we can make a few conclusions:
+1. Traditional statistics, such as strikeout rate and home run rate, are strong predictors of future ERA. This suggests that these metrics should not be overlooked when evaluating pitchers.
+2. Statcast metrics provide some value in evaluating pitchers, but they do not outperform traditional statistics. Only looking at underlying metrics may lead to missing important information about a pitcher's performance.
+3. A combination of traditional statistics and statcast metrics likely provides the best predictive performance, but more of an emphasis on traditional statistics may be warranted based on the results of this study.
+4. Elite pitchers can have aspects that may be difficult to capture with stats. My modeling may be most useful for identifying hidden gems in the free agent market, rather than predicting the very best pitchers.
 
 ## References
+Major League Baseball. (n.d.). Statcast leaderboard (custom pitcher search, 2016–2025). Baseball Savant. https://baseballsavant.mlb.com/leaderboard/custom?year=2025%2C2024%2C2023%2C2022%2C2021%2C2020%2C2019%2C2018%2C2017%2C2016&type=pitcher&filter=&min=100&selections=p_formatted_ip%2Chome_run%2Ck_percent%2Cbb_percent%2Cp_era%2Cxba%2Chard_hit_percent%2Cwhiff_percent&chart=true&x=p_formatted_ip&y=p_formatted_ip&r=no&chartType=beeswarm&sort=xwoba&sortDir=desc
+
