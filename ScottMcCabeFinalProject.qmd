@@ -590,7 +590,7 @@ From the modeling results, we can make a few conclusions:
 
 ## References
 
-Major League Baseball. (n.d.). Statcast leaderboard (custom pitcher search, 2016–2025). Baseball Savant. https://baseballsavant.mlb.com/leaderboard/custom?year=2025%2C2024%2C2023%2C2022%2C2021%2C2020%2C2019%2C2018%2C2017%2C2016&type=pitcher&filter=&min=100&selections=p_formatted_ip%2Chome_run%2Ck_percent%2Cbb_percent%2Cp_era%2Cxba%2Chard_hit_percent%2Cwhiff_percent&chart=true&x=p_formatted_ip&y=p_formatted_ip&r=no&chartType=beeswarm&sort=xwoba&sortDir=desc
+Major League Baseball. (n.d.). Statcast leaderboard (custom pitcher search, 2016–2025). Baseball Savant. https://baseballsavant.mlb.com/leaderboard/custom
 
 Major League Baseball. (n.d.). Statcast. MLB.com. Retrieved May 7, 2026, from https://www.mlb.com/glossary/statcast
 
