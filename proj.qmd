@@ -36,14 +36,15 @@ execute:
 # Statcast Data
 * Statcast data, such as exit velocity, expected batting average, and launch angle, began being collected in 2015 and has provided a new way to evaluate pitchers.
 * These statistics are more difficult to understand and calculate, but have been praised for providing a more accurate picture of a pitcher's performance.
-* For example, a pitcher with a high spin rate may be able to generate more swings and misses, even if they have a high ERA.
+* For example, a pitcher may have a lower expected batting average against than their actual batting average against, which could indicate that they were unlucky and may perform better in the future.
 
 # Example
 * This offseason, former Boston Red Sox pitcher, Lucas Giolito, was left unsigned for the entire offseason, despite having a solid 3.41 ERA in the 2025 season. The MLB average ERA in 2025 was 4.15, so Giolito's ERA was well above average. However, his underlying metrics were poor, leading many analysts to believe that he had a lucky season and his performance would regress.
 * On the other hand, when Giolito signed with the Red Sox in 2024, he had an ERA of 4.88 in the 2023 season, which was below average. However, his underlying metrics were strong, leading many analysts to believe that he had an unlucky season and his performance would improve. 
 
 ## Data
-* Dataset setup
+* The data for this project was collected from Baseball Savant, which provides a complete database of data from the MLB. This includes both traditional statistics and statcast data for all pitchers from 2016 to 2025.
+
 ```{python}
 import pandas as pd
 
@@ -93,19 +94,26 @@ df_model.head()
 
 ## Methods
 
-* The goal of this study is to evaluate the ability of traditional statistics and statcast metrics to predict future pitcher performance. 
+* The goal of this project is to evaluate the ability of traditional statistics and statcast metrics to predict future pitcher performance. 
 * The response variable is the pitcher's ERA in the following season, which is a commonly used measure of a pitcher's performance.
 * To construct this outcome, the dataset was sorted by pitcher and year, and the ERA for the next season was assigned to each row. This allows us to use the current season's statistics to predict the next season's ERA.
+  * ERA, or Earned Run Average, is calculated as (Earned Runs / Innings Pitched) * 9. It represents the average number of earned runs a pitcher allows per nine innings pitched. A lower ERA indicates better performance.
 
 Predictor Variables are divided into two categories: traditional statistics and statcast metrics.
 * Traditional statistics include:
-  * ERA (Earned Run Average)
+  * Batting Average Against
+    * BAA is calculated as (Hits Allowed / At Bats Against). It represents the average number of hits a pitcher allows per at-bat.
   * Strikeout Rate
+    * Strikeout Rate is calculated as (Strikeouts / At Bats Against). It represents the percentage of at-bats that result in a strikeout.
   * Walk Rate
+    * Walk Rate is calculated as (Walks / At Bats Against). It represents the percentage of at-bats that result in a walk.
   * Home Run Rate
+    * Home Run Rate is calculated as (Home Runs / 9 innings pitched). It represents the average number of home runs a pitcher allows per nine innings.
 * Statcast metrics include:
   * Expected Batting Average (xBA)
+    * xBA is a metric that estimates the batting average a pitcher should have allowed based on the quality of contact made by hitters. It takes things such as exit velocity and launch angle into account.
   * Hard Hit Rate
+    * Hard Hit balls are defined as those with an exit velocity of 95 mph or higher.
   * Whiff Rate
   * Out of Zone Swing Rate
 
@@ -521,5 +529,11 @@ From the modeling results, we can make a few conclusions:
 4. Elite pitchers can have aspects that may be difficult to capture with stats. My modeling may be most useful for identifying hidden gems in the free agent market, rather than predicting the very best pitchers.
 
 ## References
+
 Major League Baseball. (n.d.). Statcast leaderboard (custom pitcher search, 2016–2025). Baseball Savant. https://baseballsavant.mlb.com/leaderboard/custom?year=2025%2C2024%2C2023%2C2022%2C2021%2C2020%2C2019%2C2018%2C2017%2C2016&type=pitcher&filter=&min=100&selections=p_formatted_ip%2Chome_run%2Ck_percent%2Cbb_percent%2Cp_era%2Cxba%2Chard_hit_percent%2Cwhiff_percent&chart=true&x=p_formatted_ip&y=p_formatted_ip&r=no&chartType=beeswarm&sort=xwoba&sortDir=desc
 
+Major League Baseball. (n.d.). Statcast. MLB.com. Retrieved May 7, 2026, from MLB Statcast Glossary. https://www.mlb.com/glossary/statcast?msockid=1df105645dd7605212db10d25c486150
+
+Major League Baseball. (n.d.). Hard-hit rate. MLB.com. https://www.mlb.com/glossary/statcast/hard-hit-rate
+
+Spotrac. (2026). MLB free agents 2026. Spotrac. https://www.spotrac.com/mlb/free-agents/_/year/2026
