@@ -27,17 +27,17 @@ execute:
 
 ## Background
 
-# Traditional Statistics 
+### Traditional Statistics 
 * Traditional statistics, such as earned run average (ERA), strikeout rate, and walk rate have been used for decades to evaluate pitchers. 
 * These statistics are easy to understand and calculate, but have been criticized for not accounting for factors such as defense, luck, and park effects. 
 * For example, a pitcher with an elite defense behind him may have a lower ERA than a pitcher with a poor defense, even if they have the same underlying performance.
 
-# Statcast Data
+### Statcast Data
 * Statcast data, such as exit velocity, expected batting average, and launch angle, began being collected in 2015 and has provided a new way to evaluate pitchers.
 * These statistics are more difficult to understand and calculate, but have been praised for providing a more accurate picture of a pitcher's performance.
 * For example, a pitcher may have a lower expected batting average against than their actual batting average against, which could indicate that they were unlucky and may perform better in the future.
 
-# Example
+### Example
 * This offseason, former Boston Red Sox pitcher, Lucas Giolito, was left unsigned for the entire offseason, despite having a solid 3.41 ERA in the 2025 season. The MLB average ERA in 2025 was 4.15, so Giolito's ERA was well above average. However, his underlying metrics were poor, leading many analysts to believe that he had a lucky season and his performance would regress.
 * On the other hand, when Giolito signed with the Red Sox in 2024, he had an ERA of 4.88 in the 2023 season, which was below average. However, his underlying metrics were strong, leading many analysts to believe that he had an unlucky season and his performance would improve. 
 
@@ -99,6 +99,7 @@ df_model.head()
   * ERA, or Earned Run Average, is calculated as (Earned Runs / Innings Pitched) * 9. It represents the average number of earned runs a pitcher allows per nine innings pitched. A lower ERA indicates better performance.
 
 Predictor Variables are divided into two categories: traditional statistics and statcast metrics.
+
 * Traditional statistics include:
   * Batting Average Against
     * BAA is calculated as (Hits Allowed / At Bats Against). It represents the average number of hits a pitcher allows per at-bat.
@@ -122,6 +123,7 @@ Predictor Variables are divided into two categories: traditional statistics and 
 To ensure valid predictions, the dataset was split chronologically into training, validation, and test sets. 
 
 Three modeling approaches were used to evaluate the predictive power of the different sets of variables:
+
 1. Linear Regression
 2. Random Forest
 3. Gradient Boosting
@@ -264,7 +266,7 @@ plt.show()
 
 Strikeout rate appears to contribute the most to the model's preditions. This makes sense, as strikeouts are completely within the control of the pitcher and doesn't rely on the defense or other factors.
 
-# Prediction of Top Pitchers for 2026
+### Prediction of Top Pitchers for 2026
 
 Using the best model (Random Forest with combined features), we can predict the top pitchers for the 2026 season based on their 2025 performance.
 
@@ -328,8 +330,9 @@ top10[[
 
 This top 10 list lines up well with what many people consider to be the best pitchers in the league.
 
-# Free Agents
+### Free Agents
 The main use of a project like this is to evaluate free agents and identify the best available pitchers for a team to sign. We can use our model to predict the 2026 ERA for the free agents on the market:
+
 ```{python}
 from sklearn.ensemble import RandomForestRegressor
 
@@ -572,6 +575,7 @@ plt.show()
 ```
 
 Key Points:
+
 * The overpaid pitchers tend to be the highest paid players in the market. This shows that the market is often willing to overpay for elite pitching, due to the scarcity of top-tier pitchers.
 * The non-elite pitchers tend to be closer to the market expectation line, which suggests that the market is more efficient at pricing these players.
 
