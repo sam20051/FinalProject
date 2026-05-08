@@ -113,9 +113,12 @@ Predictor Variables are divided into two categories: traditional statistics and 
   * Expected Batting Average (xBA)
     * xBA is a metric that estimates the batting average a pitcher should have allowed based on the quality of contact made by hitters. It takes things such as exit velocity and launch angle into account.
   * Hard Hit Rate
-    * Hard Hit balls are defined as those with an exit velocity of 95 mph or higher.
+    * Hard Hit balls are defined as those with an exit velocity of 95 mph or higher. It is calculated as (Hard Hit Balls / Total Balls in Play). Hard hit balls are more likely to result in hits, so a lower hard hit rate is generally better for pitchers.
   * Whiff Rate
+    * Whiff Rate is calculated as (Whiffs / Total Swings). It represents the percentage of swings that result in a miss.
   * Out of Zone Swing Rate
+    * Out of Zone Swing Rate is calculated as (Out of Zone Swings / Total Pitches Outside the Strike Zone). It represents the percentage of pitches outside the strike zone that result in a swing.
+
 
 To ensure valid predictions, the dataset was split chronologically into training, validation, and test sets. 
 
@@ -123,7 +126,6 @@ Three modeling approaches were used to evaluate the predictive power of the diff
 1. Linear Regression
 2. Random Forest
 3. Gradient Boosting
-
 
 ```{python}
 import numpy as np
@@ -209,6 +211,9 @@ results_df
 * However, the traditional statistics can be improved by adding a few key statcast metrics, such as expected batting average and whiff rate.
 
 # Prediction of Top Pitchers for 2026
+
+Using the best model (Random Forest with combined features), we can predict the top pitchers for the 2026 season based on their 2025 performance.
+
 ```{python}
 from sklearn.ensemble import RandomForestRegressor
 
@@ -273,8 +278,10 @@ top10[[
 ]]
 ```
 
-# Free Agents
+This top 10 list lines up well with what many people consider to be the best pitchers in the league.
 
+# Free Agents
+The main use of a project like this is to evaluate free agents and identify the best available pitchers for a team to sign. We can use our model to predict the 2026 ERA for the free agents on the market:
 ```{python}
 from sklearn.ensemble import RandomForestRegressor
 
@@ -391,7 +398,11 @@ fa_results[[
 ]].head(10)
 ```
 
+The top 10 free agents based on predicted ERA using the model are mostly made up of pitchers who were signed to large contracts, which suggest that they were correctly identified as the best options in the market. However, there are a few pitchers who were signed to smaller contracts, who may represent hidden gems in the market.
+
 ## Results
+
+To show the best pitchers available in the free agent market at different price points, we can create a scatter plot of predicted ERA using the combined random forest model against the average annual value of the contract they signed for this offseason. 
 
 ```{python}
 import pandas as pd
@@ -519,6 +530,10 @@ plt.show()
 ```
 
 This chart shows the relationship between salary rank and model rank for the free agents. The green points represent the top underpaid players, who are the best values in the market according to the model. The red points represent the top overpaid players, who are the worst values in the market according to the model.
+
+Key Points:
+* The overpaid pitchers tend to be the highest paid players in the market. This shows that the market is often willing to overpay for elite pitching, due to the scarcity of top-tier pitchers.
+* The non-elite pitchers tend to be closer to the market expectation line, which suggests that the market is more efficient at pricing these players.
 
 ## Conclusion
 
