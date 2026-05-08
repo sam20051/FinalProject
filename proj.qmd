@@ -245,7 +245,7 @@ Next, we can check the feature importance for the best model to see which featur
 import pandas as pd
 import matplotlib.pyplot as plt
 
-importances = final_model.feature_importances_
+importances = best_model.feature_importances_
 
 feature_names = features_combined
 
@@ -285,13 +285,7 @@ target = 'target_era_next_year'
 # Train on full dataset
 train_full = df_model.dropna(subset=features_combined + [target])
 
-final_model = RandomForestRegressor(
-    n_estimators=200,
-    max_depth=5,
-    random_state=42
-)
-
-final_model.fit(
+best_model.fit(
     train_full[features_combined],
     train_full[target]
 )
@@ -315,7 +309,7 @@ X_latest = latest_season[features_combined]
 
 # Predict 2026 ERA
 latest_season['predicted_era_2026'] = (
-    final_model.predict(X_latest)
+    best_model.predict(X_latest)
 )
 
 # Top 10 predicted pitchers for 2026
@@ -355,13 +349,7 @@ train_full = df_model.dropna(
     subset=features_final + [target]
 )
 
-final_model = RandomForestRegressor(
-    n_estimators=200,
-    max_depth=5,
-    random_state=42
-)
-
-final_model.fit(
+best_model.fit(
     train_full[features_final],
     train_full[target]
 )
@@ -427,7 +415,7 @@ fa_data = fa_data.dropna(
 
 # Predict 2026 ERA for free agents
 fa_data['predicted_era_2026'] = (
-    final_model.predict(
+    best_model.predict(
         fa_data[features_final]
     )
 )
