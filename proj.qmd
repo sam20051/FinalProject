@@ -238,7 +238,7 @@ test_rmse = np.sqrt(
 print("Test RMSE:", round(test_rmse, 3))
 ```
 
-The test RMSE ends up being 0.9, which is a reasonable level of error. We will go ahead and use this model to predict the top pitchers for the 2026 season, based on their 2025 performance.
+The test RMSE ends up being 0.9, which is a reasonable level of error. This indicates that the model is off by about 0.9 ERA points on average, which is acceptable for this type of prediction. We will go ahead and use this model to predict the top pitchers for the 2026 season, based on their 2025 performance.
 
 Next, we can check the feature importance for the best model to see which features are driving the predictions:
 ```{python}
@@ -262,7 +262,7 @@ plt.grid(True, alpha=0.3)
 plt.show()
 ```
 
-The most important feature appears to be strikeout rate. This makes sense, as strikeouts are completely within the control of the pitcher and doesn't rely on the defense or other factors.
+Strikeout rate appears to contribute the most to the model's preditions. This makes sense, as strikeouts are completely within the control of the pitcher and doesn't rely on the defense or other factors.
 
 # Prediction of Top Pitchers for 2026
 
