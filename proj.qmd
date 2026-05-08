@@ -1,5 +1,5 @@
 ---
-title: "TITLE"
+title: "Predicting Future Pitcher Performance: A Comparison of Traditional Statistics and Statcast Metrics"
 author: "Scott McCabe"
 toc: true
 number-sections: true
@@ -18,7 +18,6 @@ execute:
     warning: false
 ---
 
-
 ## Introduction
 
 * Recently, there has been a growing debate about the usage of advanced statistics in baseball. Many new analysts have been arguing that traditional statistics, such as ERA, are not good indicators of a pitchers performance. 
@@ -29,7 +28,7 @@ execute:
 ## Background
 
 # Traditional Statistics 
-* Traditional statistics, such as ERA, Strikeout Rate, and strikeout rate have been used for decades to evaluate pitchers. 
+* Traditional statistics, such as earned run average (ERA), strikeout rate, and walk rate have been used for decades to evaluate pitchers. 
 * These statistics are easy to understand and calculate, but have been criticized for not accounting for factors such as defense, luck, and park effects. 
 * For example, a pitcher with an elite defense behind him may have a lower ERA than a pitcher with a poor defense, even if they have the same underlying performance.
 
