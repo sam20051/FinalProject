@@ -103,9 +103,9 @@ Predictor Variables are divided into two categories: traditional statistics and 
   * Batting Average Against
     * BAA is calculated as (Hits Allowed / At Bats Against). It represents the average number of hits a pitcher allows per at-bat.
   * Strikeout Rate
-    * Strikeout Rate is calculated as (Strikeouts / At Bats Against). It represents the percentage of at-bats that result in a strikeout.
+    * Strikeout Rate is calculated as (Strikeouts / Batters Faced). It represents the percentage of at-bats that result in a strikeout.
   * Walk Rate
-    * Walk Rate is calculated as (Walks / At Bats Against). It represents the percentage of at-bats that result in a walk.
+    * Walk Rate is calculated as (Walks / Batters Faced). It represents the percentage of at-bats that result in a walk.
   * Home Run Rate
     * Home Run Rate is calculated as (Home Runs / 9 innings pitched). It represents the average number of home runs a pitcher allows per nine innings.
 * Statcast metrics include:
@@ -208,6 +208,61 @@ results_df
 * From the RMSE results, we can see that the Random Forest model with the combined feature set has the lowest RMSE, indicating that it is the best model for predicting future ERA.
 * For all models, the traditional feature set outperforms the statcast feature set, suggesting that traditional statistics are better predictors than their statcast counterparts.
 * However, the traditional statistics can be improved by adding a few key statcast metrics, such as expected batting average and whiff rate.
+
+We can calculate the test RMSE for the best model to see how it performs on unseen data:
+```{python}
+# Final evaluation on test set
+
+best_model = RandomForestRegressor(
+    n_estimators=100,
+    max_depth=5,
+    random_state=42
+)
+
+best_model.fit(
+    train[features_combined],
+    train[target]
+)
+
+test_preds = best_model.predict(
+    test[features_combined]
+)
+
+test_rmse = np.sqrt(
+    mean_squared_error(
+        test[target],
+        test_preds
+    )
+)
+
+print("Test RMSE:", round(test_rmse, 3))
+```
+
+The test RMSE ends up being 0.9, which is a reasonable level of error. We will go ahead and use this model to predict the top pitchers for the 2026 season, based on their 2025 performance.
+
+Next, we can check the feature importance for the best model to see which features are driving the predictions:
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+
+importances = final_model.feature_importances_
+
+feature_names = features_combined
+
+feat_df = pd.DataFrame({
+    'feature': feature_names,
+    'importance': importances
+}).sort_values('importance')
+
+plt.figure(figsize=(8,5))
+plt.barh(feat_df['feature'], feat_df['importance'])
+plt.title("Random Forest Feature Importance (Combined Model)")
+plt.xlabel("Importance")
+plt.grid(True, alpha=0.3)
+plt.show()
+```
+
+The most important feature appears to be strikeout rate. This makes sense, as strikeouts are completely within the control of the pitcher and doesn't rely on the defense or other factors.
 
 # Prediction of Top Pitchers for 2026
 
@@ -528,8 +583,6 @@ plt.legend()
 plt.show()
 ```
 
-This chart shows the relationship between salary rank and model rank for the free agents. The green points represent the top underpaid players, who are the best values in the market according to the model. The red points represent the top overpaid players, who are the worst values in the market according to the model.
-
 Key Points:
 * The overpaid pitchers tend to be the highest paid players in the market. This shows that the market is often willing to overpay for elite pitching, due to the scarcity of top-tier pitchers.
 * The non-elite pitchers tend to be closer to the market expectation line, which suggests that the market is more efficient at pricing these players.
@@ -546,7 +599,7 @@ From the modeling results, we can make a few conclusions:
 
 Major League Baseball. (n.d.). Statcast leaderboard (custom pitcher search, 2016–2025). Baseball Savant. https://baseballsavant.mlb.com/leaderboard/custom?year=2025%2C2024%2C2023%2C2022%2C2021%2C2020%2C2019%2C2018%2C2017%2C2016&type=pitcher&filter=&min=100&selections=p_formatted_ip%2Chome_run%2Ck_percent%2Cbb_percent%2Cp_era%2Cxba%2Chard_hit_percent%2Cwhiff_percent&chart=true&x=p_formatted_ip&y=p_formatted_ip&r=no&chartType=beeswarm&sort=xwoba&sortDir=desc
 
-Major League Baseball. (n.d.). Statcast. MLB.com. Retrieved May 7, 2026, from MLB Statcast Glossary. https://www.mlb.com/glossary/statcast?msockid=1df105645dd7605212db10d25c486150
+Major League Baseball. (n.d.). Statcast. MLB.com. Retrieved May 7, 2026, from https://www.mlb.com/glossary/statcast
 
 Major League Baseball. (n.d.). Hard-hit rate. MLB.com. https://www.mlb.com/glossary/statcast/hard-hit-rate
 
